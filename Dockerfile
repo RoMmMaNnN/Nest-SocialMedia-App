@@ -1,23 +1,20 @@
-# Використовуємо офіційний Node.js образ
+# Вихідний образ
 FROM node:20-alpine
 
-# Встановлюємо робочу директорію
+# Робоча директорія
 WORKDIR /app
 
-# Копіюємо package.json і package-lock.json
+# Копіюємо package.json та package-lock.json
 COPY package*.json ./
 
 # Встановлюємо залежності
 RUN npm install
 
-# Копіюємо інші файли проєкту
+# Копіюємо весь код
 COPY . .
 
-# Компілюємо TypeScript у JS
+# Компіляція TypeScript
 RUN npm run build
 
-# Вказуємо порт
-EXPOSE 3000
-
-# Запускаємо додаток
+# Старт NestJS
 CMD ["npm", "run", "start:prod"]
