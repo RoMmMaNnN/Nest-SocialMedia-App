@@ -17,4 +17,4 @@ COPY . .
 RUN npm run build
 
 # Старт NestJS
-CMD ["npm", "run", "start:prod"]
+CMD ["npm", "run", "start:dev"]
