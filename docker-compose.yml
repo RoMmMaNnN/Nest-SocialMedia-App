@@ -1,15 +1,14 @@
-version: '3.9'
 services:
   app:
     build: .
     container_name: nest_app
     restart: always
     ports:
-      - ${PORT}:${PORT}
+      - ${APP_PORT}:${APP_PORT}
     depends_on:
       - db
     env_file:
-      - .env
+      - ./.env
     volumes:
       - .:/app
       - /app/node_modules
