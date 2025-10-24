@@ -1,28 +1,33 @@
 import {
   Injectable,
   NotFoundException,
-  BadRequestException,
   ConflictException,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, FindOptionsWhere, ILike } from 'typeorm';
-import { UserEntity } from '../entities/user.entity';
+import * as bcrypt from 'bcrypt';
+import { User } from '../entities/user.entity';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
+import { UserRole } from '../entities/user.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(UserEntity)
-    private readonly userRepo: Repository<UserEntity>,
+    @InjectRepository(User)
+    private readonly userRepo: Repository<User>,
   ) {}
 
+  // ===========================
+  // 🔍 FIND METHODS
+  // ===========================
   async findAll(query?: { page?: number; limit?: number; search?: string }) {
     const page = query?.page || 1;
     const limit = query?.limit || 10;
     const skip = (page - 1) * limit;
 
-    const where: FindOptionsWhere<UserEntity>[] = query?.search
+    const where: FindOptionsWhere<User>[] = query?.search
       ? [
           { name: ILike(`%${query.search}%`) },
           { email: ILike(`%${query.search}%`) },
@@ -47,7 +52,7 @@ export class UsersService {
   }
 
   async findOne(id: number) {
-    const user = await this.userRepo.findOneBy({ id });
+    const user = await this.userRepo.findOne({ where: { id } });
     if (!user) throw new NotFoundException('User not found');
     return user;
   }
@@ -56,11 +61,25 @@ export class UsersService {
     return this.userRepo.findOne({ where: { email } });
   }
 
+  async findById(id: number) {
+    return this.userRepo.findOne({ where: { id } });
+  }
+
+  // ===========================
+  // 🧩 CREATE / UPDATE / DELETE
+  // ===========================
   async create(dto: CreateUserDto) {
     const exists = await this.userRepo.findOneBy({ email: dto.email });
     if (exists) throw new ConflictException('Email already exists');
 
-    const user = this.userRepo.create(dto);
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
+
+    const user = this.userRepo.create({
+      ...dto,
+      password: hashedPassword,
+      role: dto.role || UserRole.USER,
+    });
+
     return this.userRepo.save(user);
   }
 
@@ -74,5 +93,17 @@ export class UsersService {
     const user = await this.findOne(id);
     await this.userRepo.remove(user);
     return { message: `User with id ${id} deleted successfully` };
+  }
+
+  // ===========================
+  // 🔑 TOKENS SUPPORT
+  // ===========================
+  async updateRefreshToken(userId: number, token?: string) {
+    const hashed = token ? await bcrypt.hash(token, 10) : undefined;
+    await this.userRepo.update(userId, { refreshToken: hashed });
+  }
+
+  async clearRefreshToken(userId: number) {
+    await this.userRepo.update(userId, { refreshToken: undefined });
   }
 }
