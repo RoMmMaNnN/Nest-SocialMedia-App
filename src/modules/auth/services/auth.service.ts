@@ -22,11 +22,7 @@ export class AuthService {
     const existing = await this.usersService.findByEmail(dto.email);
     if (existing) throw new ForbiddenException('Email already in use');
 
-    const hashedPassword = await bcrypt.hash(dto.password, 10);
-    const user = await this.usersService.create({
-      ...dto,
-      password: hashedPassword,
-    });
+    const user = await this.usersService.create(dto);
 
     const tokens = await this.generateTokens(user.id, user.email);
     await this.usersService.updateRefreshToken(user.id, tokens.refresh_token);

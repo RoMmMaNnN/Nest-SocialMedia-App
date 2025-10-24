@@ -12,7 +12,7 @@ export enum UserRole {
   MODERATOR = 'MODERATOR',
 }
 
-@Entity()
+@Entity('user')
 export class User {
   @PrimaryGeneratedColumn()
   id: number;

@@ -23,7 +23,7 @@ export class AuthController {
   @Post('refresh')
   refresh(@Req() req) {
     const user = req.user;
-    return this.authService.refresh(user.sub, req.body.refresh_token);
+    return this.authService.refresh(user.sub || user.id, user.refreshToken);
   }
 
   @UseGuards(JwtAuthGuard)
