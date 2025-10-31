@@ -58,7 +58,8 @@ export class UsersController {
 
   @Delete(':id')
   @Roles(UserRole.ADMIN)
-  remove(@Param('id') id: number) {
-    return this.usersService.remove(id);
+  async remove(@Param('id') id: number) {
+    await this.usersService.removeUserAndSessions(id);
+    return { message: `User ${id} deleted and all sessions revoked.` };
   }
 }

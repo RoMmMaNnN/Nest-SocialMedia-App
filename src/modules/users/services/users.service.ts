@@ -5,18 +5,21 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, FindOptionsWhere, ILike } from 'typeorm';
+import { DataSource, Repository, FindOptionsWhere, ILike } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { User } from '../entities/user.entity';
+import { User, UserRole } from '../entities/user.entity';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
-import { UserRole } from '../entities/user.entity';
+import { RefreshToken } from '../../auth/entities/refresh-token.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
+    @InjectRepository(RefreshToken)
+    private readonly refreshRepo: Repository<RefreshToken>,
+    private readonly dataSource: DataSource,
   ) {}
 
   // ===========================
@@ -85,6 +88,9 @@ export class UsersService {
 
   async update(id: number, dto: UpdateUserDto) {
     const user = await this.findOne(id);
+    if (dto.password) {
+      dto.password = await bcrypt.hash(dto.password, 10);
+    }
     Object.assign(user, dto);
     return this.userRepo.save(user);
   }
@@ -96,14 +102,24 @@ export class UsersService {
   }
 
   // ===========================
-  // 🔑 TOKENS SUPPORT
+  // 🔑 SECURITY UTILITIES
   // ===========================
-  async updateRefreshToken(userId: number, token?: string) {
-    const hashed = token ? await bcrypt.hash(token, 10) : undefined;
-    await this.userRepo.update(userId, { refreshToken: hashed });
+  async incrementTokenVersion(userId: number) {
+    await this.userRepo.increment({ id: userId }, 'tokenVersion', 1);
   }
 
-  async clearRefreshToken(userId: number) {
-    await this.userRepo.update(userId, { refreshToken: undefined });
+  async removeUserAndSessions(userId: number) {
+    return await this.dataSource.transaction(async (manager) => {
+      // 1️⃣ Інкрементуємо tokenVersion — всі старі access токени стають невалідними
+      await manager.increment(User, { id: userId }, 'tokenVersion', 1);
+
+      // 2️⃣ Видаляємо refresh токени
+      await manager.delete(RefreshToken, { user: { id: userId } });
+
+      // 3️⃣ Видаляємо користувача
+      await manager.delete(User, { id: userId });
+
+      return { message: `User ${userId} deleted and all sessions revoked.` };
+    });
   }
 }

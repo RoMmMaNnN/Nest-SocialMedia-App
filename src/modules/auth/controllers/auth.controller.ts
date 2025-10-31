@@ -21,9 +21,11 @@ export class AuthController {
 
   @UseGuards(RefreshTokenGuard)
   @Post('refresh')
-  refresh(@Req() req) {
-    const user = req.user;
-    return this.authService.refresh(user.sub || user.id, user.refreshToken);
+  async refresh(@Req() req) {
+    return this.authService.rotateRefreshToken(
+      req.user,
+      req.headers['user-agent'],
+    );
   }
 
   @UseGuards(JwtAuthGuard)
