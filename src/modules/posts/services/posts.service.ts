@@ -1,11 +1,17 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Post } from '../entities/post.entity';
 import { CreatePostDto } from '../dto/create-post.dto';
 import { UpdatePostDto } from '../dto/update-post.dto';
 import { UsersService } from '../../users/services/users.service';
 import { QueryPostsDto } from '../dto/query-posts.dto';
+import { PostResponseDto } from '../dto/post-response.dto';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class PostsService {
@@ -15,7 +21,10 @@ export class PostsService {
     private readonly usersService: UsersService,
   ) {}
 
-  async findAll(query?: QueryPostsDto) {
+  // ==========================
+  // 🔍 FIND METHODS
+  // ==========================
+  async findAll(query?: QueryPostsDto): Promise<PostResponseDto[]> {
     const qb = this.postRepo
       .createQueryBuilder('post')
       .leftJoinAndSelect('post.author', 'author');
@@ -36,43 +45,69 @@ export class PostsService {
       qb.orderBy('post.createdAt', 'ASC');
     }
 
-    if (query?.limit) {
-      qb.take(query.limit);
-    }
+    if (query?.limit) qb.take(query.limit);
+    if (query?.offset) qb.skip(query.offset);
 
-    if (query?.offset) {
-      qb.skip(query.offset);
-    }
-
-    return qb.getMany();
+    const posts = await qb.getMany();
+    return plainToInstance(PostResponseDto, posts, {
+      excludeExtraneousValues: true,
+    });
   }
 
-  async findOne(id: number) {
+  async findOne(id: number): Promise<PostResponseDto> {
     const post = await this.postRepo.findOne({
       where: { id },
       relations: ['author'],
     });
     if (!post) throw new NotFoundException('Post not found');
-    return post;
+    return plainToInstance(PostResponseDto, post, {
+      excludeExtraneousValues: true,
+    });
   }
 
-  async create(dto: CreatePostDto) {
-    const author = await this.usersService.findOne(dto.authorId);
+  // ==========================
+  // 🧩 CREATE / UPDATE / DELETE
+  // ==========================
+  async create(dto: CreatePostDto, userId: number): Promise<PostResponseDto> {
+    const author = await this.usersService.findOne(userId);
     const post = this.postRepo.create({ ...dto, author });
-    return this.postRepo.save(post);
+    const saved = await this.postRepo.save(post);
+    return plainToInstance(PostResponseDto, saved, {
+      excludeExtraneousValues: true,
+    });
   }
 
-  async update(id: number, dto: UpdatePostDto) {
-    const post = await this.findOne(id);
-    if (dto.authorId) {
-      post.author = await this.usersService.findOne(dto.authorId);
+  async update(
+    id: number,
+    dto: UpdatePostDto,
+    userId: number,
+  ): Promise<PostResponseDto> {
+    const post = await this.postRepo.findOne({
+      where: { id },
+      relations: ['author'],
+    });
+    if (!post) throw new NotFoundException('Post not found');
+    if (post.author.id !== userId) {
+      throw new ForbiddenException('You can only edit your own posts');
     }
+
     Object.assign(post, dto);
-    return this.postRepo.save(post);
+    const updated = await this.postRepo.save(post);
+    return plainToInstance(PostResponseDto, updated, {
+      excludeExtraneousValues: true,
+    });
   }
 
-  async remove(id: number) {
-    const post = await this.findOne(id);
+  async remove(id: number, userId: number) {
+    const post = await this.postRepo.findOne({
+      where: { id },
+      relations: ['author'],
+    });
+    if (!post) throw new NotFoundException('Post not found');
+    if (post.author.id !== userId) {
+      throw new ForbiddenException('You can only delete your own posts');
+    }
+
     await this.postRepo.remove(post);
     return { message: `Post ${id} deleted` };
   }

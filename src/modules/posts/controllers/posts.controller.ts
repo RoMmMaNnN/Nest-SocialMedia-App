@@ -1,17 +1,20 @@
 import {
   Controller,
   Get,
-  Post,
+  Post as HttpPost,
   Patch,
   Delete,
   Param,
   Body,
-  ParseIntPipe,
+  UseGuards,
+  Request,
   Query,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { PostsService } from '../services/posts.service';
 import { CreatePostDto } from '../dto/create-post.dto';
 import { UpdatePostDto } from '../dto/update-post.dto';
+import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
 import { QueryPostsDto } from '../dto/query-posts.dto';
 
 @Controller('posts')
@@ -28,18 +31,25 @@ export class PostsController {
     return this.postsService.findOne(id);
   }
 
-  @Post()
-  create(@Body() dto: CreatePostDto) {
-    return this.postsService.create(dto);
+  @UseGuards(JwtAuthGuard)
+  @HttpPost()
+  create(@Body() dto: CreatePostDto, @Request() req) {
+    return this.postsService.create(dto, req.user.sub);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
-  update(@Param('id') id: number, @Body() dto: UpdatePostDto) {
-    return this.postsService.update(id, dto);
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdatePostDto,
+    @Request() req,
+  ) {
+    return this.postsService.update(id, dto, req.user.sub);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  remove(@Param('id') id: number) {
-    return this.postsService.remove(id);
+  remove(@Param('id', ParseIntPipe) id: number, @Request() req) {
+    return this.postsService.remove(id, req.user.sub);
   }
 }
