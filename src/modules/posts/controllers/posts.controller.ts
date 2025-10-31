@@ -34,7 +34,7 @@ export class PostsController {
   @UseGuards(JwtAuthGuard)
   @HttpPost()
   create(@Body() dto: CreatePostDto, @Request() req) {
-    return this.postsService.create(dto, req.user.sub);
+    return this.postsService.create(dto, req.user.id);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -44,12 +44,12 @@ export class PostsController {
     @Body() dto: UpdatePostDto,
     @Request() req,
   ) {
-    return this.postsService.update(id, dto, req.user.sub);
+    return this.postsService.update(id, dto, req.user.id);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number, @Request() req) {
-    return this.postsService.remove(id, req.user.sub);
+    return this.postsService.remove(id, req.user.id);
   }
 }

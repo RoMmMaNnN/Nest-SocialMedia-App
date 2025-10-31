@@ -65,12 +65,18 @@ export class PostsService {
     });
   }
 
-  // ==========================
+  // ============================
   // 🧩 CREATE / UPDATE / DELETE
-  // ==========================
+  // ============================
   async create(dto: CreatePostDto, userId: number): Promise<PostResponseDto> {
+    console.log('Creating post for userId:', userId);
     const author = await this.usersService.findOne(userId);
-    const post = this.postRepo.create({ ...dto, author });
+    const post = this.postRepo.create({
+      title: dto.title,
+      content: dto.content,
+      author,
+    });
+
     const saved = await this.postRepo.save(post);
     return plainToInstance(PostResponseDto, saved, {
       excludeExtraneousValues: true,
@@ -86,8 +92,10 @@ export class PostsService {
       where: { id },
       relations: ['author'],
     });
+
     if (!post) throw new NotFoundException('Post not found');
-    if (post.author.id !== userId) {
+
+    if (!post.author || Number(post.author.id) !== Number(userId)) {
       throw new ForbiddenException('You can only edit your own posts');
     }
 
@@ -103,9 +111,13 @@ export class PostsService {
       where: { id },
       relations: ['author'],
     });
+
+    console.log(post);
+
     if (!post) throw new NotFoundException('Post not found');
-    if (post.author.id !== userId) {
-      throw new ForbiddenException('You can only delete your own posts');
+
+    if (!post.author || Number(post.author.id) !== Number(userId)) {
+      throw new ForbiddenException('You can only edit your own posts');
     }
 
     await this.postRepo.remove(post);
