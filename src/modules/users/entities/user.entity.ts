@@ -6,6 +6,7 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
+import { Post } from '../../posts/entities/post.entity';
 import { RefreshToken } from '../../auth/entities/refresh-token.entity';
 
 export enum UserRole {
@@ -40,6 +41,9 @@ export class User {
 
   @OneToMany(() => RefreshToken, (token) => token.user, { cascade: true })
   refreshTokens: RefreshToken[];
+
+  @OneToMany(() => Post, (post) => post.author)
+  posts: Post[];
 
   @CreateDateColumn()
   createdAt: Date;
