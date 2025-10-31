@@ -2,6 +2,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import cookieParser from 'cookie-parser';
+import { SeederService } from './modules/database/services/seeder.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -16,5 +17,10 @@ async function bootstrap() {
   );
 
   await app.listen(process.env.APP_PORT || 3000);
+
+  if (process.env.NODE_ENV === 'development') {
+    const seeder = app.get(SeederService);
+    await seeder.run();
+  }
 }
 bootstrap();
