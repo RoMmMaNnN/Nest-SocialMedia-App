@@ -1,23 +1,15 @@
-# Базовий образ
-FROM node:20-alpine
+FROM node:20
 
-# Робоча директорія
 WORKDIR /app
 
-# Копіюємо package.json і package-lock.json, щоб скористатися кешем npm
 COPY package*.json ./
+RUN npm ci
 
-# Встановлюємо продакшн залежності
-RUN npm install --frozen-lockfile
-
-# Копіюємо весь код
 COPY . .
 
-# Компілія TypeScript
 RUN npm run build
 
-# Виставляємо порт
-EXPOSE 3000
+# NestJS буде слухати порт з ENV
+EXPOSE ${APP_PORT}
 
-# Старт NestJS у development (для продакшн змінити на "start:prod")
-CMD ["npm", "run", "start:dev"]
+CMD ["node", "dist/main.js"]
