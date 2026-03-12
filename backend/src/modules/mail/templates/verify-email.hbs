@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verify Your Email</title>
+</head>
+<body style="margin:0;padding:0;background:#f4f4f5;font-family:system-ui,-apple-system,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f5;padding:40px 0;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+          <tr>
+            <td style="background:#6366f1;padding:32px 40px;text-align:center;">
+              <h1 style="color:#ffffff;margin:0;font-size:24px;font-weight:700;">SocialApp</h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:40px;">
+              <h2 style="color:#111827;margin:0 0 16px;font-size:20px;">Welcome, {{username}}! 🎉</h2>
+              <p style="color:#6b7280;font-size:16px;line-height:1.6;margin:0 0 32px;">
+                Thanks for signing up. Please verify your email address to activate your account.
+              </p>
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td align="center">
+                    <a href="{{verificationUrl}}"
+                       style="display:inline-block;background:#6366f1;color:#ffffff;text-decoration:none;padding:14px 32px;border-radius:6px;font-size:16px;font-weight:600;">
+                      Verify Email Address
+                    </a>
+                  </td>
+                </tr>
+              </table>
+              <p style="color:#9ca3af;font-size:14px;margin:32px 0 0;text-align:center;">
+                Or copy and paste this link:<br />
+                <a href="{{verificationUrl}}" style="color:#6366f1;word-break:break-all;">{{verificationUrl}}</a>
+              </p>
+              <p style="color:#9ca3af;font-size:12px;margin:24px 0 0;text-align:center;">
+                If you didn't create an account, you can safely ignore this email.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
