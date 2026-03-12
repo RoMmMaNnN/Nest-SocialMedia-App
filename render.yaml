@@ -76,6 +76,7 @@ services:
   - type: redis
     name: socialapp-redis
     plan: free
+    ipAllowList: []
 
 databases:
   - name: socialapp-db
