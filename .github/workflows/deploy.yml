@@ -1,34 +1,45 @@
-name: Deploy to Render
+name: Deploy
 
 on:
   push:
     branches: [main]
 
 jobs:
-  deploy:
-    name: Trigger Render Deploy
+  deploy-backend:
+    name: Deploy Backend to Railway
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy Backend
-        run: |
-          curl -s -X POST \
-            "https://api.render.com/v1/services/${{ secrets.RENDER_BACKEND_SERVICE_ID }}/deploys" \
-            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
-            -H "Content-Type: application/json" \
-            -d '{"clearCache": false}'
+      - uses: actions/checkout@v4
 
-      - name: Deploy Frontend
-        run: |
-          curl -s -X POST \
-            "https://api.render.com/v1/services/${{ secrets.RENDER_FRONTEND_SERVICE_ID }}/deploys" \
-            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
-            -H "Content-Type: application/json" \
-            -d '{"clearCache": false}'
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
 
-      - name: Wait and verify backend health
+      - name: Deploy to Railway
+        run: railway up --service socialapp-backend --detach
+        working-directory: backend
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+  deploy-frontend:
+    name: Deploy Frontend to Vercel
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel
+
+      - name: Deploy to Vercel
         run: |
-          echo "Waiting 60s for deploy to start..."
-          sleep 60
-          curl --retry 10 --retry-delay 15 --retry-connrefused \
-            "https://${{ secrets.RENDER_BACKEND_URL }}/api/health"
+          vercel pull --yes --environment=production \
+            --token=${{ secrets.VERCEL_TOKEN }}
+          vercel build --prod \
+            --token=${{ secrets.VERCEL_TOKEN }}
+          vercel deploy --prebuilt --prod \
+            --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: frontend
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}

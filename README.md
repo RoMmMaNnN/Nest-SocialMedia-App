@@ -157,27 +157,23 @@ Current status after recent updates:
 ## Deployment
 
 ### Live Demo
-- API + Swagger: https://socialapp-backend.onrender.com/api/docs
-- Frontend: https://socialapp-frontend.onrender.com
+- API + Swagger: https://socialapp-backend.up.railway.app/api/docs
+- Frontend: https://socialapp-frontend.vercel.app
 
-### Deploy to Render
-1. Push code to GitHub
-2. Go to render.com → New → Blueprint
-3. Connect your GitHub repo — Render reads `render.yaml` automatically
-4. Set secret env vars manually in each service dashboard:
-   `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`, `MAIL_*`, `CORS_ORIGIN`
-5. Done — Render builds and deploys all services
+### Stack
+- Frontend → Vercel (free, no sleep)
+- Backend + PostgreSQL + Redis → Railway (~$0 without traffic)
 
 ### CI/CD Pipeline
 Every push triggers GitHub Actions:
 - `develop` / PR → runs unit + e2e tests only
-- `main` → tests → docker build check → deploy to Render
+- `main` → tests → docker build check → deploy to Railway + Vercel
 
 ### Required GitHub Secrets
 | Secret | Where to get it |
 |--------|----------------|
-| `RENDER_API_KEY` | Render dashboard → Account → API Keys |
-| `RENDER_BACKEND_SERVICE_ID` | Render service URL (srv-xxxx) |
-| `RENDER_FRONTEND_SERVICE_ID` | Render service URL (srv-xxxx) |
-| `RENDER_BACKEND_URL` | e.g. `socialapp-backend.onrender.com` |
+| `RAILWAY_TOKEN` | railway.app → Account Settings → Tokens |
+| `VERCEL_TOKEN` | vercel.com → Account Settings → Tokens |
+| `VERCEL_ORG_ID` | vercel.com → Account Settings → General |
+| `VERCEL_PROJECT_ID` | Vercel project → Settings → General |
 

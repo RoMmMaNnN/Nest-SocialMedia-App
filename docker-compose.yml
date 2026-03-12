@@ -60,6 +60,7 @@ services:
     build:
       context: ./frontend
       args:
+        NEXT_RUNTIME: docker
         NEXT_PUBLIC_API_URL: http://localhost:3000
     restart: unless-stopped
     ports:

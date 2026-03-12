@@ -117,6 +117,7 @@ jobs:
           context: ./frontend
           push: false
           build-args: |
-            NEXT_PUBLIC_API_URL=https://placeholder.onrender.com
+            NEXT_RUNTIME=docker
+            NEXT_PUBLIC_API_URL=https://placeholder.up.railway.app
           cache-from: type=gha
           cache-to: type=gha,mode=max
