@@ -73,13 +73,12 @@ services:
       - key: NEXT_PUBLIC_API_URL
         sync: false
 
+  - type: redis
+    name: socialapp-redis
+    plan: free
+
 databases:
   - name: socialapp-db
     plan: free
     databaseName: socialapp
     user: socialapp
-
-  - type: redis
-    name: socialapp-redis
-    plan: free
-    maxmemoryPolicy: allkeys-lru
