@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { Suspense, useEffect, useState, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { usePosts } from '../../../hooks/usePosts';
@@ -17,7 +17,7 @@ function useDebounce<T>(value: T, delay: number): T {
   return debounced;
 }
 
-export default function PostsPage() {
+function PostsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { posts, page, totalPages, loading, error, fetchPosts } = usePosts();
@@ -101,5 +101,13 @@ export default function PostsPage() {
         onPageChange={handlePageChange}
       />
     </div>
+  );
+}
+
+export default function PostsPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PostsContent />
+    </Suspense>
   );
 }

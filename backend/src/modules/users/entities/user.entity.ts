@@ -31,10 +31,10 @@ export class User {
   @Column({ unique: true })
   username: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   displayName: string | null;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   avatarUrl: string | null;
 
   @Column({ type: 'text', nullable: true })
@@ -47,7 +47,7 @@ export class User {
   isEmailVerified: boolean;
 
   @Exclude()
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   emailVerificationToken: string | null;
 
   @Column({ default: 0 })

@@ -2,14 +2,14 @@ version: '3.9'
 
 services:
   postgres:
-    image: postgres:15-alpine
+    image: postgres:16-alpine
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${DB_USERNAME:-postgres}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
       POSTGRES_DB: ${DB_NAME:-socialapp}
     ports:
-      - '5432:5432'
+      - '5433:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -68,10 +68,6 @@ services:
     depends_on:
       backend:
         condition: service_healthy
-
-volumes:
-  postgres_data:
-      start_period: 40s
 
 volumes:
   postgres_data:

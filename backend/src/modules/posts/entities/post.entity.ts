@@ -21,13 +21,13 @@ export class Post {
   @Column({ type: 'text' })
   content: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   imageUrl: string | null;
 
   @Column({ default: false })
   published: boolean;
 
-  @Column({ nullable: true })
+  @Column({ type: 'int', nullable: true })
   authorId: number | null;
 
   @ManyToOne(() => User, (user) => user.posts, { onDelete: 'CASCADE' })
