@@ -20,7 +20,7 @@ export class MailService {
   ): Promise<void> {
     const verificationUrl = `${this.getFrontendUrl()}/verify-email?token=${token}`;
 
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
       this.logger.log(`[MAIL] Verification email for ${user.email}`);
       this.logger.log(`[MAIL] Verification URL: ${verificationUrl}`);
       return;
@@ -40,7 +40,7 @@ export class MailService {
   async sendPasswordResetEmail(user: User, token: string): Promise<void> {
     const resetUrl = `${this.getFrontendUrl()}/reset-password?token=${token}`;
 
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
       this.logger.log(`[MAIL] Password reset email for ${user.email}`);
       this.logger.log(`[MAIL] Password reset URL: ${resetUrl}`);
       return;

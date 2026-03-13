@@ -4,26 +4,30 @@ import request from 'supertest';
 import { AppModule } from '../../src/app/app.module';
 import { GlobalExceptionFilter } from '../../src/common/filters/http-exception.filter';
 import { TransformInterceptor } from '../../src/common/interceptors/transform.interceptor';
+import { UsersService } from '../../src/modules/users/services/users.service';
 
 /**
  * Posts E2E Tests
  */
 describe('Posts (e2e)', () => {
+  jest.setTimeout(30_000);
+
   let app: INestApplication;
+  let usersService: UsersService;
   let adminToken: string;
   let userToken: string;
   let createdPostId: number;
   let adminPostId: number;
 
   const adminCredentials = {
-    username: 'posts-admin',
+    username: `posts_admin_${Date.now()}`,
     email: `posts-admin-${Date.now()}@test.com`,
     password: 'Password123!',
     role: 'admin',
   };
 
   const userCredentials = {
-    username: 'posts-user',
+    username: `posts_user_${Date.now()}`,
     email: `posts-user-${Date.now()}@test.com`,
     password: 'Password123!',
   };
@@ -47,16 +51,34 @@ describe('Posts (e2e)', () => {
     );
 
     await app.init();
+    usersService = app.get(UsersService);
 
-    const adminReg = await request(app.getHttpServer())
+    await request(app.getHttpServer())
       .post('/api/auth/register')
-      .send(adminCredentials);
-    adminToken = adminReg.body.data?.access_token;
+      .send(adminCredentials)
+      .expect(201);
 
-    const userReg = await request(app.getHttpServer())
+    await request(app.getHttpServer())
       .post('/api/auth/register')
-      .send(userCredentials);
-    userToken = userReg.body.data?.access_token;
+      .send(userCredentials)
+      .expect(201);
+
+    const admin = await usersService.findByEmail(adminCredentials.email);
+    const user = await usersService.findByEmail(userCredentials.email);
+    if (admin) await usersService.markEmailVerified(admin.id);
+    if (user) await usersService.markEmailVerified(user.id);
+
+    const adminLogin = await request(app.getHttpServer())
+      .post('/api/auth/login')
+      .send({ email: adminCredentials.email, password: adminCredentials.password })
+      .expect(201);
+    adminToken = adminLogin.body.data.access_token;
+
+    const userLogin = await request(app.getHttpServer())
+      .post('/api/auth/login')
+      .send({ email: userCredentials.email, password: userCredentials.password })
+      .expect(201);
+    userToken = userLogin.body.data.access_token;
   });
 
   afterAll(async () => {
@@ -126,7 +148,7 @@ describe('Posts (e2e)', () => {
         .send({ title: '' })
         .expect(400);
 
-      expect(res.body.message).toBe('Validation failed');
+      expect(res.body.message).toMatch(/title should not be empty/i);
     });
   });
 

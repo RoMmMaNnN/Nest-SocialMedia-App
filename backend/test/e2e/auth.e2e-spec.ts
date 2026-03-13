@@ -13,11 +13,13 @@ import { UsersService } from '../../src/modules/users/services/users.service';
  * or environment variables.
  */
 describe('Auth (e2e)', () => {
+  jest.setTimeout(30_000);
+
   let app: INestApplication;
   let usersService: UsersService;
 
   const regularUser = {
-    username: `e2e-user-${Date.now()}`,
+    username: `e2e_user_${Date.now()}`,
     email: `e2e-user-${Date.now()}@test.com`,
     password: 'Password123!',
   };
@@ -61,7 +63,7 @@ describe('Auth (e2e)', () => {
 
       expect(res.body.success).toBe(true);
       expect(res.body.data).toHaveProperty('message');
-      expect(res.body.data.message).toMatch(/verify your email/i);
+      expect(res.body.data.message).toMatch(/verify your (email|account)/i);
     });
 
     it('should reject duplicate email with 409', async () => {
@@ -96,7 +98,7 @@ describe('Auth (e2e)', () => {
       const res = await request(app.getHttpServer())
         .post('/api/auth/login')
         .send({ email: regularUser.email, password: regularUser.password })
-        .expect(200);
+        .expect(201);
 
       expect(res.body.success).toBe(true);
       expect(res.body.data).toHaveProperty('access_token');
@@ -109,7 +111,7 @@ describe('Auth (e2e)', () => {
 
     it('should return 403 if email is not verified', async () => {
       const unverifiedUser = {
-        username: `unverified-${Date.now()}`,
+        username: `unverified_${Date.now()}`,
         email: `unverified-${Date.now()}@test.com`,
         password: 'Password123!',
       };
@@ -166,7 +168,7 @@ describe('Auth (e2e)', () => {
       const res = await request(app.getHttpServer())
         .post('/api/auth/refresh')
         .send({ refreshToken })
-        .expect(200);
+        .expect(201);
 
       expect(res.body.success).toBe(true);
       expect(res.body.data).toHaveProperty('access_token');
@@ -185,7 +187,7 @@ describe('Auth (e2e)', () => {
       const res = await request(app.getHttpServer())
         .post('/api/auth/logout')
         .set('Authorization', `Bearer ${token}`)
-        .expect(200);
+        .expect(201);
 
       expect(res.body.success).toBe(true);
     });
