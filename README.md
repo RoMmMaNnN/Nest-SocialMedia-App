@@ -157,8 +157,8 @@ Current status after recent updates:
 ## Deployment
 
 ### Live Demo
-- API + Swagger: https://socialapp-backend.up.railway.app/api/docs
-- Frontend: https://socialapp-frontend.vercel.app
+- [API + Swagger](https://socialapp-backend-production-372e.up.railway.app/api/docs)
+- [Frontend](https://socialapp-frontend.vercel.app)
 
 ### Stack
 - Frontend → Vercel (free, no sleep)
