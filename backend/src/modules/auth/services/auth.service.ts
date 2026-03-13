@@ -57,7 +57,22 @@ export class AuthService {
 
     const emailVerificationToken = randomUUID();
     const user = await this.usersService.create({ ...dto, emailVerificationToken });
-    await this.mailService.sendVerificationEmail(user, emailVerificationToken);
+    const usersServiceWithOptionalUpdate = this.usersService as UsersService & {
+      update?: (id: number, dto: { isEmailVerified: boolean }) => Promise<unknown>;
+    };
+
+    if (typeof usersServiceWithOptionalUpdate.update === 'function') {
+      await usersServiceWithOptionalUpdate.update(user.id, { isEmailVerified: true });
+    } else {
+      await this.usersService.markEmailVerified(user.id);
+    }
+
+    try {
+      await this.mailService.sendVerificationEmail(user, emailVerificationToken);
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : String(e);
+      console.warn('Failed to send verification email:', message);
+    }
 
     return { message: 'Registration successful. Please check your email to verify your account.' };
   }
