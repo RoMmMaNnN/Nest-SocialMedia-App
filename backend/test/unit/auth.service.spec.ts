@@ -9,6 +9,7 @@ import { User } from '../../src/modules/users/entities/user.entity';
 import * as bcrypt from 'bcrypt';
 import {
   BadRequestException,
+  ConflictException,
   ForbiddenException,
   NotFoundException,
   UnauthorizedException,
@@ -86,19 +87,19 @@ describe('AuthService', () => {
       expect(result.message).toContain('Registration successful');
     });
 
-    it('should throw ForbiddenException if email already exists', async () => {
+    it('should throw ConflictException if email already exists', async () => {
       usersService.findByEmail.mockResolvedValue({ id: 1 } as User);
       await expect(
         service.register({ email: 'a@b.com', username: 'user1', password: 'pass' } as any),
-      ).rejects.toThrow(ForbiddenException);
+      ).rejects.toThrow(ConflictException);
     });
 
-    it('should throw ForbiddenException if username already taken', async () => {
+    it('should throw ConflictException if username already taken', async () => {
       usersService.findByEmail.mockResolvedValue(null);
       usersService.findByUsername.mockResolvedValue({ id: 2 } as User);
       await expect(
         service.register({ email: 'new@b.com', username: 'taken', password: 'pass' } as any),
-      ).rejects.toThrow(ForbiddenException);
+      ).rejects.toThrow(ConflictException);
     });
   });
 
