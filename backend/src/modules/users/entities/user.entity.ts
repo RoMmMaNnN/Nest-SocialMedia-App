@@ -50,6 +50,13 @@ export class User {
   @Column({ type: 'varchar', nullable: true })
   emailVerificationToken: string | null;
 
+  @Exclude()
+  @Column({ type: 'varchar', nullable: true })
+  resetPasswordToken: string | null;
+
+  @Column({ type: 'timestamp', nullable: true })
+  resetPasswordExpiresAt: Date | null;
+
   @Column({ default: 0 })
   tokenVersion: number;
 

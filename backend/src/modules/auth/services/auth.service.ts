@@ -1,18 +1,22 @@
 import {
+  BadRequestException,
   Injectable,
   UnauthorizedException,
   ForbiddenException,
   NotFoundException,
 } from '@nestjs/common';
+import { randomUUID, createHash } from 'crypto';
+import * as bcrypt from 'bcrypt';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { UsersService } from '../../users/services/users.service';
 import { JwtHelperService } from '../../jwt/services/jwt-helper.service';
-import * as bcrypt from 'bcrypt';
-import { v4 as uuidv4 } from 'uuid';
 import { RegisterDto } from '../dto/register.dto';
 import { LoginDto } from '../dto/login.dto';
 import { RefreshTokenDto } from '../dto/refresh-token.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ForgotPasswordDto } from '../dto/forgot-password.dto';
+import { ResetPasswordDto } from '../dto/reset-password.dto';
+import { ChangePasswordDto } from '../dto/change-password.dto';
 import { RefreshToken } from '../entities/refresh-token.entity';
 import { User } from '../../users/entities/user.entity';
 import { MailService } from '../../mail/services/mail.service';
@@ -39,16 +43,14 @@ export class AuthService {
     private readonly refreshRepo: Repository<RefreshToken>,
   ) {}
 
-  async register(
-    dto: RegisterDto,
-  ): Promise<{ message: string }> {
+  async register(dto: RegisterDto): Promise<{ message: string }> {
     const existing = await this.usersService.findByEmail(dto.email);
     if (existing) throw new ForbiddenException('Email already in use');
 
     const existingUsername = await this.usersService.findByUsername(dto.username);
     if (existingUsername) throw new ForbiddenException('Username already taken');
 
-    const emailVerificationToken = uuidv4();
+    const emailVerificationToken = randomUUID();
     const user = await this.usersService.create({ ...dto, emailVerificationToken });
     await this.mailService.sendVerificationEmail(user, emailVerificationToken);
 
@@ -63,9 +65,74 @@ export class AuthService {
     return { message: 'Email verified successfully. You can now log in.' };
   }
 
-  async login(
-    dto: LoginDto,
-  ): Promise<{ user: User; access_token: string; refresh_token: string }> {
+  async forgotPassword(dto: ForgotPasswordDto): Promise<{ message: string }> {
+    const user = await this.usersService.findByEmail(dto.email);
+
+    if (!user) {
+      return { message: 'If this email exists, a reset link has been sent' };
+    }
+
+    const resetToken = randomUUID();
+    const hashedResetToken = this.hashResetToken(resetToken);
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+
+    await this.usersService.setPasswordResetToken(user.id, hashedResetToken, expiresAt);
+    await this.mailService.sendPasswordResetEmail(user, resetToken);
+
+    return { message: 'If this email exists, a reset link has been sent' };
+  }
+
+  async resetPassword(dto: ResetPasswordDto): Promise<{ message: string }> {
+    const { token, newPassword, confirmPassword } = dto;
+
+    if (newPassword !== confirmPassword) {
+      throw new BadRequestException('Passwords do not match');
+    }
+
+    const hashedToken = this.hashResetToken(token);
+    const user = await this.usersService.findByResetPasswordToken(hashedToken);
+
+    if (!user || !user.resetPasswordToken || !user.resetPasswordExpiresAt || user.resetPasswordExpiresAt < new Date()) {
+      throw new BadRequestException('Reset token is invalid or expired');
+    }
+
+    const passwordHash = await bcrypt.hash(newPassword, 12);
+    await this.usersService.updatePasswordHash(user.id, passwordHash);
+    await this.usersService.clearPasswordResetToken(user.id);
+    await this.refreshRepo.delete({ userId: user.id });
+
+    return { message: 'Password reset successfully' };
+  }
+
+  async changePassword(userId: number, dto: ChangePasswordDto): Promise<{ message: string }> {
+    const { currentPassword, newPassword, confirmPassword } = dto;
+
+    if (newPassword !== confirmPassword) {
+      throw new BadRequestException('Passwords do not match');
+    }
+
+    if (newPassword === currentPassword) {
+      throw new BadRequestException('New password must be different from current password');
+    }
+
+    const user = await this.usersService.findById(userId);
+    if (!user) {
+      throw new UnauthorizedException('Invalid user');
+    }
+
+    const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
+    if (!isCurrentPasswordValid) {
+      throw new UnauthorizedException('Current password is incorrect');
+    }
+
+    const passwordHash = await bcrypt.hash(newPassword, 12);
+    await this.usersService.updatePasswordHash(user.id, passwordHash);
+    await this.refreshRepo.delete({ userId: user.id });
+
+    return { message: 'Password changed successfully' };
+  }
+
+  async login(dto: LoginDto): Promise<{ user: User; access_token: string; refresh_token: string }> {
     const user = await this.usersService.findByEmail(dto.email);
     if (!user) throw new UnauthorizedException('Invalid credentials');
 
@@ -124,6 +191,10 @@ export class AuthService {
     return { message: 'Logged out successfully' };
   }
 
+  private hashResetToken(token: string): string {
+    return createHash('sha256').update(token).digest('hex');
+  }
+
   private async generateAndStoreTokens(
     user: User,
   ): Promise<{ user: User; access_token: string; refresh_token: string }> {
@@ -137,7 +208,6 @@ export class AuthService {
     const access_token = this.jwtHelper.signAccess(jwtPayload);
     const refresh_token = this.jwtHelper.signRefresh(jwtPayload);
 
-    // One session per user — delete existing refresh tokens before storing the new one
     await this.refreshRepo.delete({ userId: user.id });
 
     const hashedToken = await bcrypt.hash(refresh_token, 10);

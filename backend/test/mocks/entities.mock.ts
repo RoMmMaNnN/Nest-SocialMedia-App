@@ -13,6 +13,8 @@ export const mockUser: User = {
   role: UserRole.USER,
   isEmailVerified: true,
   emailVerificationToken: null,
+  resetPasswordToken: null,
+  resetPasswordExpiresAt: null,
   refreshTokens: [],
   posts: [],
   comments: [],

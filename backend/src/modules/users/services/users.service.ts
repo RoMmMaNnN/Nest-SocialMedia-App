@@ -78,6 +78,31 @@ export class UsersService {
     return this.userRepo.findOneBy({ emailVerificationToken: token });
   }
 
+  async findByResetPasswordToken(token: string): Promise<User | null> {
+    return this.userRepo.findOneBy({ resetPasswordToken: token });
+  }
+
+  async setPasswordResetToken(userId: number, token: string, expiresAt: Date): Promise<void> {
+    await this.userRepo.update(userId, {
+      resetPasswordToken: token,
+      resetPasswordExpiresAt: expiresAt,
+    });
+    await this.cacheManager.clear();
+  }
+
+  async clearPasswordResetToken(userId: number): Promise<void> {
+    await this.userRepo.update(userId, {
+      resetPasswordToken: null,
+      resetPasswordExpiresAt: null,
+    });
+    await this.cacheManager.clear();
+  }
+
+  async updatePasswordHash(userId: number, passwordHash: string): Promise<void> {
+    await this.userRepo.update(userId, { password: passwordHash });
+    await this.cacheManager.clear();
+  }
+
   async markEmailVerified(userId: number): Promise<void> {
     await this.userRepo.update(userId, {
       isEmailVerified: true,

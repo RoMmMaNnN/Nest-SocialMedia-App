@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, UseGuards } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -12,6 +12,9 @@ import { RegisterDto } from '../dto/register.dto';
 import { LoginDto } from '../dto/login.dto';
 import { RefreshTokenDto } from '../dto/refresh-token.dto';
 import { VerifyEmailDto } from '../dto/verify-email.dto';
+import { ForgotPasswordDto } from '../dto/forgot-password.dto';
+import { ResetPasswordDto } from '../dto/reset-password.dto';
+import { ChangePasswordDto } from '../dto/change-password.dto';
 import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../../../common/decorators/current-user.decorator';
 import { Public } from '../../../common/decorators/public.decorator';
@@ -44,6 +47,25 @@ export class AuthController {
     return this.authService.verifyEmail(dto.token);
   }
 
+  @ApiOperation({ summary: 'Request password reset email' })
+  @ApiResponse({ status: 200, description: 'Password reset response returned.' })
+  @ApiBody({ type: ForgotPasswordDto })
+  @Public()
+  @Post('forgot-password')
+  forgotPassword(@Body() dto: ForgotPasswordDto): Promise<{ message: string }> {
+    return this.authService.forgotPassword(dto);
+  }
+
+  @ApiOperation({ summary: 'Reset password using token from email' })
+  @ApiResponse({ status: 200, description: 'Password reset successful.' })
+  @ApiResponse({ status: 400, description: 'Invalid reset token or payload.' })
+  @ApiBody({ type: ResetPasswordDto })
+  @Public()
+  @Post('reset-password')
+  resetPassword(@Body() dto: ResetPasswordDto): Promise<{ message: string }> {
+    return this.authService.resetPassword(dto);
+  }
+
   @ApiOperation({ summary: 'Login and receive JWT tokens' })
   @ApiResponse({ status: 200, description: 'Login successful.' })
   @ApiResponse({ status: 401, description: 'Invalid credentials.' })
@@ -74,6 +96,20 @@ export class AuthController {
   @Get('me')
   me(@CurrentUser() user: User): User {
     return user;
+  }
+
+  @ApiOperation({ summary: 'Change password for current authenticated user' })
+  @ApiResponse({ status: 200, description: 'Password changed.' })
+  @ApiResponse({ status: 400, description: 'Invalid password payload.' })
+  @ApiResponse({ status: 401, description: 'Current password is invalid.' })
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard)
+  @Patch('change-password')
+  changePassword(
+    @CurrentUser() user: { id: number },
+    @Body() dto: ChangePasswordDto,
+  ): Promise<{ message: string }> {
+    return this.authService.changePassword(user.id, dto);
   }
 
   @ApiOperation({ summary: 'Logout and revoke refresh tokens' })

@@ -7,7 +7,12 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { RefreshToken } from '../../src/modules/auth/entities/refresh-token.entity';
 import { User } from '../../src/modules/users/entities/user.entity';
 import * as bcrypt from 'bcrypt';
-import { ForbiddenException, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { mockUser } from '../mocks/entities.mock';
 import { mockMailService } from '../mocks/mail-service.mock';
 
@@ -36,7 +41,12 @@ describe('AuthService', () => {
             findByEmail: jest.fn(),
             findByUsername: jest.fn(),
             findByVerificationToken: jest.fn(),
+            findByResetPasswordToken: jest.fn(),
             markEmailVerified: jest.fn(),
+            setPasswordResetToken: jest.fn(),
+            clearPasswordResetToken: jest.fn(),
+            updatePasswordHash: jest.fn(),
+            findById: jest.fn(),
             create: jest.fn(),
             incrementTokenVersion: jest.fn(),
           },
@@ -105,6 +115,61 @@ describe('AuthService', () => {
     it('should throw NotFoundException if token is invalid', async () => {
       usersService.findByVerificationToken.mockResolvedValue(null);
       await expect(service.verifyEmail('bad-token')).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('forgotPassword', () => {
+    it('should return success message when user is not found', async () => {
+      usersService.findByEmail.mockResolvedValue(null);
+
+      const result = await service.forgotPassword({ email: 'missing@mail.com' });
+
+      expect(result).toEqual({ message: 'If this email exists, a reset link has been sent' });
+      expect(usersService.setPasswordResetToken).not.toHaveBeenCalled();
+      expect(mockMailService.sendPasswordResetEmail).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('resetPassword', () => {
+    it('should throw BadRequestException if passwords do not match', async () => {
+      await expect(
+        service.resetPassword({
+          token: 'any-token',
+          newPassword: 'newPassword123',
+          confirmPassword: 'differentPassword123',
+        }),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw BadRequestException if token is expired', async () => {
+      usersService.findByResetPasswordToken.mockResolvedValue({
+        ...mockUser,
+        resetPasswordToken: 'hashed-token',
+        resetPasswordExpiresAt: new Date(Date.now() - 1000),
+      } as User);
+
+      await expect(
+        service.resetPassword({
+          token: 'expired-token',
+          newPassword: 'newPassword123',
+          confirmPassword: 'newPassword123',
+        }),
+      ).rejects.toThrow(BadRequestException);
+    });
+  });
+
+  describe('changePassword', () => {
+    it('should throw UnauthorizedException if current password is incorrect', async () => {
+      usersService.findById.mockResolvedValue({ ...mockUser } as User);
+      (bcrypt.compare as jest.Mock).mockResolvedValue(false);
+
+      await expect(
+        service.changePassword(mockUser.id, {
+          currentPassword: 'wrong-password',
+          newPassword: 'newPassword123',
+          confirmPassword: 'newPassword123',
+        }),
+      ).rejects.toThrow(UnauthorizedException);
     });
   });
 

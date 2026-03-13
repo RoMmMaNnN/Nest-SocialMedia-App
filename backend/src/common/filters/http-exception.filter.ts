@@ -25,16 +25,20 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       status = exception.getStatus();
       const exceptionResponse = exception.getResponse();
 
-      if (typeof exceptionResponse === 'string') {
-        message = exceptionResponse;
+      if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
+        errors = 'errors' in exceptionResponse
+          ? ((exceptionResponse as { errors?: string[] }).errors ?? [])
+          : [];
+
+        const responseMessage = 'message' in exceptionResponse
+          ? (exceptionResponse as { message?: string | string[] }).message
+          : exception.message;
+
+        message = Array.isArray(responseMessage)
+          ? responseMessage.join(', ')
+          : (responseMessage ?? exception.message);
       } else {
-        const res = exceptionResponse as Record<string, unknown>;
-        if (Array.isArray(res.message)) {
-          message = 'Validation failed';
-          errors = res.message as string[];
-        } else {
-          message = (res.message as string) ?? message;
-        }
+        message = exceptionResponse;
       }
     } else if (exception instanceof Error) {
       message = exception.message;

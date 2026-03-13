@@ -1,4 +1,8 @@
-import { ValidationPipe, ClassSerializerInterceptor } from '@nestjs/common';
+import {
+  BadRequestException,
+  ValidationPipe,
+  ClassSerializerInterceptor,
+} from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -31,6 +35,19 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
       transform: true,
       transformOptions: { enableImplicitConversion: true },
+      exceptionFactory: (errors) => {
+        const messages = errors.flatMap((error) =>
+          Object.values(error.constraints ?? {}).map(
+            (msg) => `${error.property}: ${msg}`,
+          ),
+        );
+
+        return new BadRequestException({
+          statusCode: 400,
+          message: 'Validation failed',
+          errors: messages,
+        });
+      },
     }),
   );
 
