@@ -51,7 +51,7 @@ function PostsContent() {
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between gap-4">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100">Feed</h1>
-        <Link href="/upload" className="text-sm font-medium text-gray-900 hover:underline dark:text-slate-100">
+        <Link href="/upload" className="text-sm font-medium text-gray-900 hover:underline dark:text-sky-300">
           Create post
         </Link>
       </div>
@@ -73,7 +73,7 @@ function PostsContent() {
       )}
 
       {error && (
-        <p className="rounded-md bg-red-50 px-4 py-3 text-sm text-red-600">{error}</p>
+        <p className="rounded-md bg-red-50 px-4 py-3 text-sm text-red-600 dark:bg-rose-500/15 dark:text-rose-300 dark:ring-1 dark:ring-rose-400/30">{error}</p>
       )}
 
       {!loading && !error && posts.length === 0 && (

@@ -23,7 +23,7 @@ function excerpt(content: string, maxLength = 150): string {
 export function PostCard({ post }: PostCardProps) {
   return (
     <Link href={`/posts/${post.id}`} className="block">
-      <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
+      <Card className="h-full cursor-pointer transition-shadow hover:shadow-md dark:hover:shadow-[0_20px_40px_-24px_rgba(56,189,248,0.65)]">
         <div className="flex flex-col gap-3">
           {post.imageUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -35,16 +35,16 @@ export function PostCard({ post }: PostCardProps) {
           ) : null}
 
           <div className="flex items-start justify-between gap-2">
-            <h2 className="text-lg font-semibold text-gray-900 line-clamp-2 dark:text-slate-100">
+            <h2 className="line-clamp-2 text-lg font-semibold text-gray-900 dark:text-slate-100">
               {post.title}
             </h2>
             {post.published && (
-              <span className="shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+              <span className="shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-emerald-500/20 dark:text-emerald-300 dark:ring-1 dark:ring-emerald-400/30">
                 Published
               </span>
             )}
           </div>
-          <p className="text-sm text-gray-600 leading-relaxed dark:text-slate-300">
+          <p className="text-sm leading-relaxed text-gray-600 dark:text-slate-300">
             {excerpt(post.content)}
           </p>
           <div className="mt-auto flex items-center justify-between text-xs text-gray-400 dark:text-slate-400">

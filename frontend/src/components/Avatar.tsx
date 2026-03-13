@@ -20,7 +20,7 @@ export function Avatar({ username, avatarUrl, size = 40 }: AvatarProps) {
 
   return (
     <div
-      className="flex items-center justify-center rounded-full bg-gray-900 text-xs font-semibold text-white"
+      className="flex items-center justify-center rounded-full bg-gray-900 text-xs font-semibold text-white dark:bg-sky-500 dark:text-slate-950"
       style={style}
       aria-label={username}
       title={username}

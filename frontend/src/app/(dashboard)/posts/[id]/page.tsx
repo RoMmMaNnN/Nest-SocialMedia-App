@@ -86,7 +86,7 @@ export default function PostDetailPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-5">
       <div>
-        <Link href="/posts" className="text-sm text-gray-500 hover:underline dark:text-slate-400">
+        <Link href="/posts" className="text-sm text-gray-500 hover:underline dark:text-slate-400 dark:hover:text-sky-300">
           ← Back to feed
         </Link>
       </div>
@@ -128,14 +128,14 @@ export default function PostDetailPage() {
             {total} comments
           </h2>
           {!isLoggedIn ? (
-            <Link href="/login" className="text-sm font-medium text-gray-700 hover:underline dark:text-slate-200">
+            <Link href="/login" className="text-sm font-medium text-gray-700 hover:underline dark:text-sky-300">
               Login to comment
             </Link>
           ) : null}
         </div>
 
         {isLoggedIn ? (
-          <div className="mb-5 rounded-md border border-gray-200 bg-gray-50 p-4 dark:border-slate-700 dark:bg-slate-800">
+          <div className="mb-5 rounded-md border border-gray-200 bg-gray-50 p-4 dark:border-slate-700 dark:bg-slate-900/65">
             <CommentForm onSubmit={handleAddComment} loading={submitting} />
           </div>
         ) : null}

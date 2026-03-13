@@ -156,7 +156,7 @@ export default function SettingsPage() {
         <p className="mt-2 text-sm text-gray-600 dark:text-slate-300">
           You need to be logged in to manage your settings.
         </p>
-        <Link href="/login" className="mt-4 inline-block text-sm font-medium text-gray-900 hover:underline dark:text-slate-100">
+        <Link href="/login" className="mt-4 inline-block text-sm font-medium text-gray-900 hover:underline dark:text-sky-300">
           Login to continue
         </Link>
       </Card>
@@ -199,7 +199,7 @@ export default function SettingsPage() {
               onChange={(e) => setBio(e.target.value)}
               rows={4}
               maxLength={300}
-              className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
+              className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 dark:border-slate-700 dark:bg-slate-950/70 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-sky-500 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-sky-500"
             />
           </div>
 
@@ -212,15 +212,15 @@ export default function SettingsPage() {
               type="file"
               accept="image/*"
               onChange={(e) => setAvatarFile(e.target.files?.[0] ?? null)}
-              className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
+              className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 dark:border-slate-700 dark:bg-slate-950/70 dark:text-slate-100 dark:file:rounded-md dark:file:border-0 dark:file:bg-slate-800 dark:file:px-3 dark:file:py-1.5 dark:file:text-sm dark:file:font-medium dark:file:text-slate-200"
             />
           </div>
 
           {profileError ? (
-            <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-600">{profileError}</p>
+            <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-rose-500/15 dark:text-rose-300 dark:ring-1 dark:ring-rose-400/30">{profileError}</p>
           ) : null}
           {profileSuccess ? (
-            <p className="rounded-md bg-green-50 px-3 py-2 text-sm text-green-700">{profileSuccess}</p>
+            <p className="rounded-md bg-green-50 px-3 py-2 text-sm text-green-700 dark:bg-emerald-500/15 dark:text-emerald-300 dark:ring-1 dark:ring-emerald-400/30">{profileSuccess}</p>
           ) : null}
 
           <Button type="submit" isLoading={savingProfile}>
@@ -261,10 +261,10 @@ export default function SettingsPage() {
           />
 
           {passwordError ? (
-            <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-600">{passwordError}</p>
+            <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-rose-500/15 dark:text-rose-300 dark:ring-1 dark:ring-rose-400/30">{passwordError}</p>
           ) : null}
           {passwordSuccess ? (
-            <p className="rounded-md bg-green-50 px-3 py-2 text-sm text-green-700">{passwordSuccess}</p>
+            <p className="rounded-md bg-green-50 px-3 py-2 text-sm text-green-700 dark:bg-emerald-500/15 dark:text-emerald-300 dark:ring-1 dark:ring-emerald-400/30">{passwordSuccess}</p>
           ) : null}
 
           <Button type="submit" isLoading={savingPassword}>

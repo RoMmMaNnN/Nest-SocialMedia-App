@@ -70,33 +70,33 @@ export function Navbar() {
   };
 
   return (
-    <nav className="border-b border-gray-200 bg-white dark:border-slate-700 dark:bg-slate-900">
+    <nav className="border-b border-gray-200 bg-white dark:border-slate-800 dark:bg-[#0d1320]/95 dark:backdrop-blur">
       <div className="mx-auto max-w-5xl px-4 sm:px-6">
         <div className="flex h-16 items-center justify-between">
           <Link
             href="/posts"
-            className="text-xl font-bold text-gray-900 hover:text-gray-700 dark:text-slate-100 dark:hover:text-slate-300"
+            className="text-xl font-bold text-gray-900 hover:text-gray-700 dark:text-slate-100 dark:hover:text-sky-300"
           >
             NestSocial
           </Link>
 
           <div className="hidden items-center gap-4 md:flex">
-            <Link href="/posts" className="text-sm text-gray-600 hover:text-gray-900 dark:text-slate-300 dark:hover:text-slate-100">
+            <Link href="/posts" className="text-sm text-gray-600 hover:text-gray-900 dark:text-slate-300 dark:hover:text-sky-300">
               Feed
             </Link>
             {profileHref ? (
-              <Link href={profileHref} className="text-sm text-gray-600 hover:text-gray-900 dark:text-slate-300 dark:hover:text-slate-100">
+              <Link href={profileHref} className="text-sm text-gray-600 hover:text-gray-900 dark:text-slate-300 dark:hover:text-sky-300">
                 Profile
               </Link>
             ) : null}
-            <Link href="/settings" className="text-sm text-gray-600 hover:text-gray-900 dark:text-slate-300 dark:hover:text-slate-100">
+            <Link href="/settings" className="text-sm text-gray-600 hover:text-gray-900 dark:text-slate-300 dark:hover:text-sky-300">
               Settings
             </Link>
 
             <button
               type="button"
               onClick={toggleDarkMode}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-gray-300 text-gray-700 transition-colors hover:bg-gray-100 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-gray-300 text-gray-700 transition-colors hover:bg-gray-100 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-200 dark:hover:bg-slate-800"
               aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
               title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
             >
@@ -139,7 +139,7 @@ export function Navbar() {
             <button
               type="button"
               onClick={toggleDarkMode}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-gray-300 text-gray-700 transition-colors hover:bg-gray-100 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-gray-300 text-gray-700 transition-colors hover:bg-gray-100 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-200 dark:hover:bg-slate-800"
               aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
             >
               {isDark ? (
@@ -155,7 +155,7 @@ export function Navbar() {
             <button
               type="button"
               onClick={() => setMenuOpen((prev) => !prev)}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-gray-300 text-gray-700 dark:border-slate-600 dark:text-slate-200"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-gray-300 text-gray-700 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-200 dark:hover:bg-slate-800"
               aria-label="Toggle navigation menu"
             >
               <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
@@ -166,16 +166,16 @@ export function Navbar() {
         </div>
 
         {menuOpen ? (
-          <div className="flex flex-col gap-3 border-t border-gray-200 py-4 md:hidden dark:border-slate-700">
-            <Link href="/posts" onClick={() => setMenuOpen(false)} className="text-sm text-gray-700 dark:text-slate-300">
+          <div className="flex flex-col gap-3 border-t border-gray-200 py-4 md:hidden dark:border-slate-800">
+            <Link href="/posts" onClick={() => setMenuOpen(false)} className="text-sm text-gray-700 dark:text-slate-300 dark:hover:text-sky-300">
               Feed
             </Link>
             {profileHref ? (
-              <Link href={profileHref} onClick={() => setMenuOpen(false)} className="text-sm text-gray-700 dark:text-slate-300">
+              <Link href={profileHref} onClick={() => setMenuOpen(false)} className="text-sm text-gray-700 dark:text-slate-300 dark:hover:text-sky-300">
                 Profile
               </Link>
             ) : null}
-            <Link href="/settings" onClick={() => setMenuOpen(false)} className="text-sm text-gray-700 dark:text-slate-300">
+            <Link href="/settings" onClick={() => setMenuOpen(false)} className="text-sm text-gray-700 dark:text-slate-300 dark:hover:text-sky-300">
               Settings
             </Link>
 

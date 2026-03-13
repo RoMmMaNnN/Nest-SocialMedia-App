@@ -21,7 +21,7 @@ export default function LoginPage() {
     <div className="flex min-h-[60vh] items-center justify-center">
       <div className="w-full max-w-sm">
         <Card>
-          <h1 className="mb-6 text-2xl font-bold text-gray-900">Sign in</h1>
+          <h1 className="mb-6 text-2xl font-bold text-gray-900 dark:text-slate-100">Sign in</h1>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <Input
@@ -36,7 +36,7 @@ export default function LoginPage() {
               error={fieldErrors.email?.[0]}
             />
             {fieldErrors.email?.map((err, i) => (
-              <p key={`email-${i}`} className="text-red-500 text-sm -mt-2">
+              <p key={`email-${i}`} className="-mt-2 text-sm text-red-500 dark:text-rose-300">
                 {err}
               </p>
             ))}
@@ -53,13 +53,13 @@ export default function LoginPage() {
               error={fieldErrors.password?.[0]}
             />
             {fieldErrors.password?.map((err, i) => (
-              <p key={`password-${i}`} className="text-red-500 text-sm -mt-2">
+              <p key={`password-${i}`} className="-mt-2 text-sm text-red-500 dark:text-rose-300">
                 {err}
               </p>
             ))}
 
             {error && (
-              <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-600">
+              <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-rose-500/15 dark:text-rose-300 dark:ring-1 dark:ring-rose-400/30">
                 {error}
               </p>
             )}
@@ -69,9 +69,9 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          <p className="mt-4 text-center text-sm text-gray-600">
+          <p className="mt-4 text-center text-sm text-gray-600 dark:text-slate-300">
             No account?{' '}
-            <Link href="/register" className="font-medium text-gray-900 hover:underline">
+            <Link href="/register" className="font-medium text-gray-900 hover:underline dark:text-sky-300">
               Register
             </Link>
           </p>

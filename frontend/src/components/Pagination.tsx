@@ -18,7 +18,7 @@ export function Pagination({ page, totalPages, onPageChange }: PaginationProps) 
       >
         ← Previous
       </Button>
-      <span className="text-sm text-gray-600">
+      <span className="text-sm text-gray-600 dark:text-slate-300">
         Page {page} of {totalPages}
       </span>
       <Button
