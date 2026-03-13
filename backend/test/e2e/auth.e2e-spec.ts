@@ -109,7 +109,7 @@ describe('Auth (e2e)', () => {
       refreshToken = res.body.data.refresh_token;
     });
 
-    it('should return 403 if email is not verified', async () => {
+    it('should allow login without email verification', async () => {
       const unverifiedUser = {
         username: `unverified_${Date.now()}`,
         email: `unverified-${Date.now()}@test.com`,
@@ -122,10 +122,9 @@ describe('Auth (e2e)', () => {
       const res = await request(app.getHttpServer())
         .post('/api/auth/login')
         .send({ email: unverifiedUser.email, password: unverifiedUser.password })
-        .expect(403);
+        .expect(201);
 
-      expect(res.body.statusCode).toBe(403);
-      expect(res.body.message).toMatch(/verify your email/i);
+      expect(res.body.data).toHaveProperty('access_token');
     });
 
     it('should return 401 on wrong password', async () => {
