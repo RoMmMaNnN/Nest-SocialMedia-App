@@ -78,8 +78,8 @@ export default function ProfilePage() {
     return user && currentUserId && currentUserId !== user.id;
   }, [user, currentUserId]);
 
-  if (loading) return <p>Loading profile...</p>;
-  if (error || !user) return <p className="text-red-600">{error ?? 'Profile not found'}</p>;
+  if (loading) return <p className="text-sm text-gray-700 dark:text-slate-300">Loading profile...</p>;
+  if (error || !user) return <p className="text-sm text-red-600 dark:text-rose-300">{error ?? 'Profile not found'}</p>;
 
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-5">
@@ -88,9 +88,9 @@ export default function ProfilePage() {
           <div className="flex items-center gap-4">
             <Avatar username={user.username} avatarUrl={user.avatarUrl} size={64} />
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">@{user.username}</h1>
-              {user.displayName ? <p className="text-sm text-gray-600">{user.displayName}</p> : null}
-              {user.bio ? <p className="mt-1 text-sm text-gray-700">{user.bio}</p> : null}
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">@{user.username}</h1>
+              {user.displayName ? <p className="text-sm text-gray-700 dark:text-slate-300">{user.displayName}</p> : null}
+              {user.bio ? <p className="mt-1 text-sm text-gray-800 dark:text-slate-200">{user.bio}</p> : null}
             </div>
           </div>
           {canFollow ? (
@@ -101,7 +101,7 @@ export default function ProfilePage() {
           ) : null}
         </div>
 
-        <div className="mt-4 flex gap-6 text-sm text-gray-700">
+        <div className="mt-4 flex gap-6 text-sm text-gray-800 dark:text-slate-300">
           <span><strong>{posts.length}</strong> posts</span>
           <span><strong>{followers}</strong> followers</span>
           <span><strong>{following}</strong> following</span>

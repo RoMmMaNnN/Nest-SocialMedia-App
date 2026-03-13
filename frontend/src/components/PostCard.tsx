@@ -44,10 +44,10 @@ export function PostCard({ post }: PostCardProps) {
               </span>
             )}
           </div>
-          <p className="text-sm leading-relaxed text-gray-600 dark:text-slate-300">
+          <p className="text-sm leading-relaxed text-gray-700 dark:text-slate-300">
             {excerpt(post.content)}
           </p>
-          <div className="mt-auto flex items-center justify-between text-xs text-gray-400 dark:text-slate-400">
+          <div className="mt-auto flex items-center justify-between text-xs text-gray-500 dark:text-slate-400">
             <span>@{post.author?.username ?? 'unknown'}</span>
             <div className="flex items-center gap-3">
               <span>♥ {post.likesCount ?? 0}</span>

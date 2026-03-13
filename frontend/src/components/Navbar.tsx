@@ -75,21 +75,21 @@ export function Navbar() {
         <div className="flex h-16 items-center justify-between">
           <Link
             href="/posts"
-            className="text-xl font-bold text-gray-900 hover:text-gray-700 dark:text-slate-100 dark:hover:text-sky-300"
+            className="text-xl font-bold text-gray-900 hover:text-gray-800 dark:text-slate-100 dark:hover:text-sky-300"
           >
             NestSocial
           </Link>
 
           <div className="hidden items-center gap-4 md:flex">
-            <Link href="/posts" className="text-sm text-gray-600 hover:text-gray-900 dark:text-slate-300 dark:hover:text-sky-300">
+            <Link href="/posts" className="text-sm text-gray-700 hover:text-gray-900 dark:text-slate-300 dark:hover:text-sky-300">
               Feed
             </Link>
             {profileHref ? (
-              <Link href={profileHref} className="text-sm text-gray-600 hover:text-gray-900 dark:text-slate-300 dark:hover:text-sky-300">
+              <Link href={profileHref} className="text-sm text-gray-700 hover:text-gray-900 dark:text-slate-300 dark:hover:text-sky-300">
                 Profile
               </Link>
             ) : null}
-            <Link href="/settings" className="text-sm text-gray-600 hover:text-gray-900 dark:text-slate-300 dark:hover:text-sky-300">
+            <Link href="/settings" className="text-sm text-gray-700 hover:text-gray-900 dark:text-slate-300 dark:hover:text-sky-300">
               Settings
             </Link>
 

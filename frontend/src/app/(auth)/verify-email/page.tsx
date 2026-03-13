@@ -38,21 +38,21 @@ function VerifyEmailContent() {
 
           {!token ? (
             <>
-              <h1 className="mb-2 text-2xl font-bold text-gray-900">Check your email</h1>
-              <p className="mb-6 text-sm text-gray-600">
+              <h1 className="mb-2 text-2xl font-bold text-gray-900 dark:text-slate-100">Check your email</h1>
+              <p className="mb-6 text-sm text-gray-700 dark:text-slate-300">
                 We sent a verification link to your inbox. Click it to activate your account before logging in.
               </p>
             </>
           ) : (
             <>
-              <h1 className="mb-2 text-2xl font-bold text-gray-900">Email verification</h1>
-              <p className="mb-6 text-sm text-gray-600">
+              <h1 className="mb-2 text-2xl font-bold text-gray-900 dark:text-slate-100">Email verification</h1>
+              <p className="mb-6 text-sm text-gray-700 dark:text-slate-300">
                 {status === 'verifying' ? 'Verifying your email...' : message}
               </p>
             </>
           )}
 
-          <Link href="/login" className="text-sm font-medium text-gray-900 hover:underline">
+          <Link href="/login" className="text-sm font-medium text-gray-900 hover:underline dark:text-sky-300">
             Back to sign in
           </Link>
         </Card>
@@ -63,7 +63,7 @@ function VerifyEmailContent() {
 
 export default function VerifyEmailPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div className="text-sm text-gray-700 dark:text-slate-300">Loading...</div>}>
       <VerifyEmailContent />
     </Suspense>
   );

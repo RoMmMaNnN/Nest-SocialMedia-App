@@ -60,7 +60,7 @@ export default function UploadPage() {
   return (
     <div className="mx-auto w-full max-w-2xl">
       <Card>
-        <h1 className="mb-6 text-2xl font-bold text-gray-900">Create a post</h1>
+        <h1 className="mb-6 text-2xl font-bold text-gray-900 dark:text-slate-100">Create a post</h1>
 
         <form onSubmit={submit} className="space-y-4">
           <Input
@@ -73,7 +73,7 @@ export default function UploadPage() {
           />
 
           <div className="flex flex-col gap-1">
-            <label htmlFor="content" className="text-sm font-medium text-gray-700">
+            <label htmlFor="content" className="text-sm font-medium text-gray-800 dark:text-slate-300">
               Content
             </label>
             <textarea
@@ -82,12 +82,12 @@ export default function UploadPage() {
               onChange={(e) => setContent(e.target.value)}
               rows={8}
               required
-              className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900"
+              className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500 dark:border-slate-700 dark:bg-slate-950/70 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-sky-500 dark:focus:ring-sky-500"
             />
           </div>
 
           <div className="flex flex-col gap-1">
-            <label htmlFor="image" className="text-sm font-medium text-gray-700">
+            <label htmlFor="image" className="text-sm font-medium text-gray-800 dark:text-slate-300">
               Image (optional)
             </label>
             <input
@@ -95,21 +95,22 @@ export default function UploadPage() {
               type="file"
               accept="image/*"
               onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-              className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900"
+              className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 dark:border-slate-700 dark:bg-slate-950/70 dark:text-slate-100 dark:file:rounded-md dark:file:border-0 dark:file:bg-slate-800 dark:file:px-3 dark:file:py-1.5 dark:file:text-sm dark:file:font-medium dark:file:text-slate-200"
             />
           </div>
 
-          <label className="inline-flex items-center gap-2 text-sm text-gray-700">
+          <label className="inline-flex items-center gap-2 text-sm text-gray-800 dark:text-slate-300">
             <input
               type="checkbox"
               checked={published}
               onChange={(e) => setPublished(e.target.checked)}
+              className="h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-gray-500 dark:border-slate-600 dark:bg-slate-900 dark:text-sky-400 dark:focus:ring-sky-400"
             />
             Publish immediately
           </label>
 
           {error ? (
-            <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
+            <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-rose-500/15 dark:text-rose-300 dark:ring-1 dark:ring-rose-400/30">{error}</p>
           ) : null}
 
           <Button type="submit" isLoading={loading}>

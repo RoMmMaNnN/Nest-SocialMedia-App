@@ -31,7 +31,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-screen bg-gray-50 antialiased dark:bg-transparent">
+      <body className="min-h-screen bg-white text-gray-900 antialiased dark:bg-transparent dark:text-slate-100">
         <Navbar />
         <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6">{children}</main>
       </body>

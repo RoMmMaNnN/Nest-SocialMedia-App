@@ -146,14 +146,14 @@ export default function SettingsPage() {
   };
 
   if (loadingUser) {
-    return <p className="text-sm text-gray-600 dark:text-slate-300">Loading settings...</p>;
+    return <p className="text-sm text-gray-700 dark:text-slate-300">Loading settings...</p>;
   }
 
   if (!currentUser) {
     return (
       <Card>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">Settings</h1>
-        <p className="mt-2 text-sm text-gray-600 dark:text-slate-300">
+        <p className="mt-2 text-sm text-gray-700 dark:text-slate-300">
           You need to be logged in to manage your settings.
         </p>
         <Link href="/login" className="mt-4 inline-block text-sm font-medium text-gray-900 hover:underline dark:text-sky-300">
@@ -275,7 +275,7 @@ export default function SettingsPage() {
 
       <Card>
         <h2 className="mb-2 text-xl font-semibold text-gray-900 dark:text-slate-100">Appearance</h2>
-        <p className="mb-4 text-sm text-gray-600 dark:text-slate-300">Switch between light and dark mode.</p>
+        <p className="mb-4 text-sm text-gray-700 dark:text-slate-300">Switch between light and dark mode.</p>
         <Button variant="secondary" onClick={toggleTheme}>
           {theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
         </Button>

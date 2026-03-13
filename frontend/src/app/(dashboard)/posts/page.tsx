@@ -77,7 +77,7 @@ function PostsContent() {
       )}
 
       {!loading && !error && posts.length === 0 && (
-        <p className="py-12 text-center text-gray-500 dark:text-slate-400">No posts found.</p>
+        <p className="py-12 text-center text-gray-600 dark:text-slate-400">No posts found.</p>
       )}
 
       {!loading && posts.length > 0 && (
@@ -89,7 +89,7 @@ function PostsContent() {
           </div>
 
           <div className="flex flex-col items-center gap-3 py-2">
-            <p className="text-sm text-gray-500 dark:text-slate-400">
+            <p className="text-sm text-gray-600 dark:text-slate-400">
               Showing {posts.length} posts
             </p>
             {page < totalPages ? (
