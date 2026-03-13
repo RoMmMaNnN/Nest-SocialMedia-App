@@ -67,7 +67,7 @@ jobs:
           MAIL_PASS: test
 
       - name: Run e2e tests
-        run: npm run test:e2e -- --forceExit
+        run: npm run test:e2e -- --runInBand --forceExit
         working-directory: backend
         env:
           NODE_ENV: test
