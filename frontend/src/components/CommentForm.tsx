@@ -30,7 +30,7 @@ export function CommentForm({ onSubmit, loading = false }: CommentFormProps) {
       />
       <div>
         <Button type="submit" isLoading={loading}>
-          Comment
+          Post Comment
         </Button>
       </div>
     </form>

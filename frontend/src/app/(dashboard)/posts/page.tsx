@@ -1,12 +1,13 @@
 'use client';
 
-import { Suspense, useEffect, useState, useCallback } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePosts } from '../../../hooks/usePosts';
 import { PostCard } from '../../../components/PostCard';
-import { Pagination } from '../../../components/Pagination';
+import { Button } from '../../../components/ui/Button';
 import { Input } from '../../../components/ui/Input';
+
+const PAGE_LIMIT = 20;
 
 function useDebounce<T>(value: T, delay: number): T {
   const [debounced, setDebounced] = useState(value);
@@ -18,47 +19,39 @@ function useDebounce<T>(value: T, delay: number): T {
 }
 
 function PostsContent() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
   const { posts, page, totalPages, loading, error, fetchPosts } = usePosts();
 
-  const [search, setSearch] = useState(searchParams.get('search') ?? '');
+  const [search, setSearch] = useState('');
   const debouncedSearch = useDebounce(search, 400);
-
-  const currentPage = Number(searchParams.get('page') ?? '1');
+  const [currentPage, setCurrentPage] = useState(1);
 
   const load = useCallback(
-    (p: number, s: string) => {
-      fetchPosts({ page: p, limit: 10, search: s || undefined });
+    (p: number, s: string, append = false) => {
+      fetchPosts({ page: p, limit: PAGE_LIMIT, search: s || undefined }, append);
     },
     [fetchPosts],
   );
 
   useEffect(() => {
-    load(currentPage, debouncedSearch);
-  }, [currentPage, debouncedSearch, load]);
+    setCurrentPage(1);
+    load(1, debouncedSearch);
+  }, [debouncedSearch, load]);
 
-  const handlePageChange = (newPage: number) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('page', String(newPage));
-    router.push(`/posts?${params.toString()}`);
+  const handleLoadMore = () => {
+    const nextPage = currentPage + 1;
+    setCurrentPage(nextPage);
+    load(nextPage, debouncedSearch, true);
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearch(value);
-    const params = new URLSearchParams(searchParams.toString());
-    if (value) params.set('search', value);
-    else params.delete('search');
-    params.set('page', '1');
-    router.push(`/posts?${params.toString()}`);
+    setSearch(e.target.value);
   };
 
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between gap-4">
-        <h1 className="text-3xl font-bold text-gray-900">Feed</h1>
-        <Link href="/upload" className="text-sm font-medium text-gray-900 hover:underline">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100">Feed</h1>
+        <Link href="/upload" className="text-sm font-medium text-gray-900 hover:underline dark:text-slate-100">
           Create post
         </Link>
       </div>
@@ -75,7 +68,7 @@ function PostsContent() {
 
       {loading && (
         <div className="flex justify-center py-12">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-gray-700" />
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-gray-700 dark:border-slate-600 dark:border-t-slate-200" />
         </div>
       )}
 
@@ -84,30 +77,33 @@ function PostsContent() {
       )}
 
       {!loading && !error && posts.length === 0 && (
-        <p className="py-12 text-center text-gray-500">No posts found.</p>
+        <p className="py-12 text-center text-gray-500 dark:text-slate-400">No posts found.</p>
       )}
 
       {!loading && posts.length > 0 && (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {posts.map((post) => (
-            <PostCard key={post.id} post={post} />
-          ))}
-        </div>
-      )}
+        <>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {posts.map((post) => (
+              <PostCard key={post.id} post={post} />
+            ))}
+          </div>
 
-      <Pagination
-        page={page}
-        totalPages={totalPages}
-        onPageChange={handlePageChange}
-      />
+          <div className="flex flex-col items-center gap-3 py-2">
+            <p className="text-sm text-gray-500 dark:text-slate-400">
+              Showing {posts.length} posts
+            </p>
+            {page < totalPages ? (
+              <Button onClick={handleLoadMore} isLoading={loading}>
+                Load more
+              </Button>
+            ) : null}
+          </div>
+        </>
+      )}
     </div>
   );
 }
 
 export default function PostsPage() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <PostsContent />
-    </Suspense>
-  );
+  return <PostsContent />;
 }

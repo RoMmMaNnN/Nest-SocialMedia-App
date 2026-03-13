@@ -8,7 +8,7 @@ import { Input } from '../../../components/ui/Input';
 import { Card } from '../../../components/ui/Card';
 
 export default function RegisterPage() {
-  const { register, loading, error } = useAuth();
+  const { register, loading, error, fieldErrors } = useAuth();
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -32,6 +32,9 @@ export default function RegisterPage() {
     await register(username, email, password);
   };
 
+  const confirmPasswordErrors = localError && localError.includes('match') ? [localError] : [];
+  const passwordLocalErrors = localError && localError.includes('least') ? [localError] : [];
+
   return (
     <div className="flex min-h-[60vh] items-center justify-center">
       <div className="w-full max-w-sm">
@@ -48,7 +51,13 @@ export default function RegisterPage() {
               placeholder="john_doe"
               required
               autoComplete="username"
+              error={fieldErrors.username?.[0]}
             />
+            {fieldErrors.username?.map((err, i) => (
+              <p key={`username-${i}`} className="text-red-500 text-sm -mt-2">
+                {err}
+              </p>
+            ))}
 
             <Input
               id="email"
@@ -59,7 +68,13 @@ export default function RegisterPage() {
               placeholder="you@example.com"
               required
               autoComplete="email"
+              error={fieldErrors.email?.[0]}
             />
+            {fieldErrors.email?.map((err, i) => (
+              <p key={`email-${i}`} className="text-red-500 text-sm -mt-2">
+                {err}
+              </p>
+            ))}
 
             <Input
               id="password"
@@ -70,7 +85,18 @@ export default function RegisterPage() {
               placeholder="••••••••"
               required
               autoComplete="new-password"
+              error={fieldErrors.password?.[0] ?? passwordLocalErrors[0]}
             />
+            {fieldErrors.password?.map((err, i) => (
+              <p key={`password-api-${i}`} className="text-red-500 text-sm -mt-2">
+                {err}
+              </p>
+            ))}
+            {passwordLocalErrors.map((err, i) => (
+              <p key={`password-local-${i}`} className="text-red-500 text-sm -mt-2">
+                {err}
+              </p>
+            ))}
 
             <Input
               id="confirmPassword"
@@ -81,12 +107,17 @@ export default function RegisterPage() {
               placeholder="••••••••"
               required
               autoComplete="new-password"
-              error={localError && localError.includes('match') ? localError : undefined}
+              error={confirmPasswordErrors[0]}
             />
+            {confirmPasswordErrors.map((err, i) => (
+              <p key={`confirm-password-${i}`} className="text-red-500 text-sm -mt-2">
+                {err}
+              </p>
+            ))}
 
-            {(error || (localError && !localError.includes('match'))) && (
+            {error && (
               <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-600">
-                {error || localError}
+                {error}
               </p>
             )}
 

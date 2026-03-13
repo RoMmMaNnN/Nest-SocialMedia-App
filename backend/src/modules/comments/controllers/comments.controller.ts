@@ -21,7 +21,6 @@ import { Public } from '../../../common/decorators/public.decorator';
 @ApiTags('comments')
 @ApiBearerAuth()
 @Controller('posts/:postId/comments')
-@UseGuards(JwtAuthGuard)
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
@@ -37,6 +36,7 @@ export class CommentsController {
   }
 
   @ApiOperation({ summary: 'Create a comment on a post' })
+  @UseGuards(JwtAuthGuard)
   @Post()
   create(
     @Param('postId', ParseIntPipe) postId: number,
@@ -47,6 +47,7 @@ export class CommentsController {
   }
 
   @ApiOperation({ summary: 'Update a comment' })
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
@@ -57,6 +58,7 @@ export class CommentsController {
   }
 
   @ApiOperation({ summary: 'Delete a comment' })
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(
     @Param('id', ParseIntPipe) id: number,

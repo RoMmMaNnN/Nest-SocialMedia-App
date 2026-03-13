@@ -25,8 +25,17 @@ export function PostCard({ post }: PostCardProps) {
     <Link href={`/posts/${post.id}`} className="block">
       <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
         <div className="flex flex-col gap-3">
+          {post.imageUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={post.imageUrl}
+              alt={post.title}
+              className="w-full h-48 object-cover rounded-t-lg"
+            />
+          ) : null}
+
           <div className="flex items-start justify-between gap-2">
-            <h2 className="text-lg font-semibold text-gray-900 line-clamp-2">
+            <h2 className="text-lg font-semibold text-gray-900 line-clamp-2 dark:text-slate-100">
               {post.title}
             </h2>
             {post.published && (
@@ -35,10 +44,10 @@ export function PostCard({ post }: PostCardProps) {
               </span>
             )}
           </div>
-          <p className="text-sm text-gray-600 leading-relaxed">
+          <p className="text-sm text-gray-600 leading-relaxed dark:text-slate-300">
             {excerpt(post.content)}
           </p>
-          <div className="mt-auto flex items-center justify-between text-xs text-gray-400">
+          <div className="mt-auto flex items-center justify-between text-xs text-gray-400 dark:text-slate-400">
             <span>@{post.author?.username ?? 'unknown'}</span>
             <div className="flex items-center gap-3">
               <span>♥ {post.likesCount ?? 0}</span>

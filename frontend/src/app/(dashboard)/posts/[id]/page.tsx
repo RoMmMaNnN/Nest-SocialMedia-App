@@ -31,7 +31,14 @@ export default function PostDetailPage() {
   const id = Number(params.id);
 
   const { post, loading, error, fetchPost, toggleLike } = usePost(id);
-  const { comments, submitting, fetchComments, addComment } = useComments(id);
+  const {
+    comments,
+    total,
+    loading: commentsLoading,
+    submitting,
+    fetchComments,
+    addComment,
+  } = useComments(id);
   const [deleting, setDeleting] = useState(false);
 
   const isLoggedIn = !!getAccessToken();
@@ -53,6 +60,10 @@ export default function PostDetailPage() {
     }
   };
 
+  const handleAddComment = async (content: string) => {
+    await addComment(content);
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center py-16">
@@ -64,8 +75,8 @@ export default function PostDetailPage() {
   if (error || !post) {
     return (
       <div className="py-16 text-center">
-        <p className="text-lg text-gray-600">{error ?? 'Post not found'}</p>
-        <Link href="/posts" className="mt-4 inline-block text-sm text-gray-500 hover:underline">
+        <p className="text-lg text-gray-600 dark:text-slate-300">{error ?? 'Post not found'}</p>
+        <Link href="/posts" className="mt-4 inline-block text-sm text-gray-500 hover:underline dark:text-slate-400">
           ← Back to posts
         </Link>
       </div>
@@ -75,7 +86,7 @@ export default function PostDetailPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-5">
       <div>
-        <Link href="/posts" className="text-sm text-gray-500 hover:underline">
+        <Link href="/posts" className="text-sm text-gray-500 hover:underline dark:text-slate-400">
           ← Back to feed
         </Link>
       </div>
@@ -85,23 +96,23 @@ export default function PostDetailPage() {
           <div className="flex items-center gap-3">
             <Avatar username={post.author.username} avatarUrl={post.author.avatarUrl} />
             <div>
-              <p className="text-sm font-medium text-gray-900">@{post.author.username}</p>
-              <p className="text-xs text-gray-500">{formatDate(post.createdAt)}</p>
+              <p className="text-sm font-medium text-gray-900 dark:text-slate-100">@{post.author.username}</p>
+              <p className="text-xs text-gray-500 dark:text-slate-400">{formatDate(post.createdAt)}</p>
             </div>
           </div>
 
-          <h1 className="text-3xl font-bold text-gray-900">{post.title}</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100">{post.title}</h1>
 
           {post.imageUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={post.imageUrl} alt={post.title} className="max-h-96 w-full rounded-md object-cover" />
           ) : null}
 
-          <p className="whitespace-pre-wrap text-gray-700">{post.content}</p>
+          <p className="whitespace-pre-wrap text-gray-700 dark:text-slate-300">{post.content}</p>
 
           <div className="flex flex-wrap items-center gap-3 pt-2">
             <LikeButton liked={post.isLiked} likesCount={post.likesCount} onToggle={toggleLike} />
-            <span className="text-sm text-gray-500">{post.commentsCount} comments</span>
+            <span className="text-sm text-gray-500 dark:text-slate-400">{total} comments</span>
             {isLoggedIn ? (
               <Button variant="danger" onClick={handleDelete} isLoading={deleting}>
                 Delete
@@ -111,16 +122,31 @@ export default function PostDetailPage() {
         </div>
       </Card>
 
-      {isLoggedIn ? (
-        <Card>
-          <h2 className="mb-3 text-lg font-semibold text-gray-900">Add comment</h2>
-          <CommentForm onSubmit={addComment} loading={submitting} />
-        </Card>
-      ) : null}
-
       <Card>
-        <h2 className="mb-3 text-lg font-semibold text-gray-900">Comments</h2>
-        <CommentList comments={comments} />
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-100">
+            {total} comments
+          </h2>
+          {!isLoggedIn ? (
+            <Link href="/login" className="text-sm font-medium text-gray-700 hover:underline dark:text-slate-200">
+              Login to comment
+            </Link>
+          ) : null}
+        </div>
+
+        {isLoggedIn ? (
+          <div className="mb-5 rounded-md border border-gray-200 bg-gray-50 p-4 dark:border-slate-700 dark:bg-slate-800">
+            <CommentForm onSubmit={handleAddComment} loading={submitting} />
+          </div>
+        ) : null}
+
+        {commentsLoading ? (
+          <div className="flex justify-center py-8">
+            <Spinner />
+          </div>
+        ) : (
+          <CommentList comments={comments} />
+        )}
       </Card>
     </div>
   );

@@ -4,7 +4,7 @@ import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import apiClient from '../lib/api';
 import { saveTokens, clearTokens, isAuthenticated } from '../lib/auth';
-import { ApiResponse } from '../types/api';
+import { ApiErrorResponse, ApiResponse } from '../types/api';
 import { User } from '../types/user';
 
 interface AuthTokens {
@@ -17,15 +17,44 @@ interface RegisterResponse {
   message: string;
 }
 
+type FieldErrors = Record<string, string[]>;
+
+function parseFieldErrors(errors: string[] | undefined): FieldErrors {
+  if (!errors?.length) return {};
+
+  const parsed: FieldErrors = {};
+
+  for (const error of errors) {
+    const separatorIndex = error.indexOf(':');
+
+    if (separatorIndex <= 0) {
+      if (!parsed.general) parsed.general = [];
+      parsed.general.push(error);
+      continue;
+    }
+
+    const field = error.slice(0, separatorIndex).trim();
+    const message = error.slice(separatorIndex + 1).trim();
+    if (!field || !message) continue;
+
+    if (!parsed[field]) parsed[field] = [];
+    parsed[field].push(message);
+  }
+
+  return parsed;
+}
+
 export function useAuth() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
 
   const login = useCallback(
     async (email: string, password: string): Promise<void> => {
       setLoading(true);
       setError(null);
+      setFieldErrors({});
       try {
         const res = await apiClient.post<ApiResponse<AuthTokens>>(
           '/api/auth/login',
@@ -35,10 +64,12 @@ export function useAuth() {
         saveTokens(access_token, refresh_token);
         router.push('/posts');
       } catch (err: unknown) {
-        const message =
-          (err as { response?: { data?: { message?: string } } })?.response
-            ?.data?.message || 'Login failed';
+        const errorResponse = (err as { response?: { data?: ApiErrorResponse } })
+          ?.response?.data;
+        const parsed = parseFieldErrors(errorResponse?.errors);
+        const message = errorResponse?.message || 'Login failed';
         setError(message);
+        setFieldErrors(parsed);
       } finally {
         setLoading(false);
       }
@@ -50,6 +81,7 @@ export function useAuth() {
     async (username: string, email: string, password: string): Promise<void> => {
       setLoading(true);
       setError(null);
+      setFieldErrors({});
       try {
         await apiClient.post<ApiResponse<RegisterResponse>>(
           '/api/auth/register',
@@ -57,10 +89,12 @@ export function useAuth() {
         );
         router.push('/verify-email');
       } catch (err: unknown) {
-        const message =
-          (err as { response?: { data?: { message?: string } } })?.response
-            ?.data?.message || 'Registration failed';
+        const errorResponse = (err as { response?: { data?: ApiErrorResponse } })
+          ?.response?.data;
+        const parsed = parseFieldErrors(errorResponse?.errors);
+        const message = errorResponse?.message || 'Registration failed';
         setError(message);
+        setFieldErrors(parsed);
       } finally {
         setLoading(false);
       }
@@ -83,6 +117,7 @@ export function useAuth() {
     logout,
     loading,
     error,
+    fieldErrors,
     isAuthenticated: isAuthenticated(),
   };
 }

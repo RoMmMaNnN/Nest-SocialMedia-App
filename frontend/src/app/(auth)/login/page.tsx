@@ -8,7 +8,7 @@ import { Input } from '../../../components/ui/Input';
 import { Card } from '../../../components/ui/Card';
 
 export default function LoginPage() {
-  const { login, loading, error } = useAuth();
+  const { login, loading, error, fieldErrors } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -33,7 +33,13 @@ export default function LoginPage() {
               placeholder="you@example.com"
               required
               autoComplete="email"
+              error={fieldErrors.email?.[0]}
             />
+            {fieldErrors.email?.map((err, i) => (
+              <p key={`email-${i}`} className="text-red-500 text-sm -mt-2">
+                {err}
+              </p>
+            ))}
 
             <Input
               id="password"
@@ -44,7 +50,13 @@ export default function LoginPage() {
               placeholder="••••••••"
               required
               autoComplete="current-password"
+              error={fieldErrors.password?.[0]}
             />
+            {fieldErrors.password?.map((err, i) => (
+              <p key={`password-${i}`} className="text-red-500 text-sm -mt-2">
+                {err}
+              </p>
+            ))}
 
             {error && (
               <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-600">

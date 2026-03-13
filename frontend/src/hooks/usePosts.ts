@@ -16,12 +16,12 @@ export function usePosts() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
-  const [limit] = useState(10);
+  const [limit] = useState(20);
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchPosts = useCallback(async (query: PostsQuery = {}): Promise<void> => {
+  const fetchPosts = useCallback(async (query: PostsQuery = {}, append = false): Promise<void> => {
     setLoading(true);
     setError(null);
     try {
@@ -35,7 +35,7 @@ export function usePosts() {
         `/api/posts?${params.toString()}`,
       );
       const data = res.data.data;
-      setPosts(data.data);
+      setPosts((prev) => (append ? [...prev, ...data.data] : data.data));
       setTotal(data.total);
       setPage(data.page);
       setTotalPages(data.totalPages);
