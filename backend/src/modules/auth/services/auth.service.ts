@@ -4,6 +4,7 @@ import {
   UnauthorizedException,
   ForbiddenException,
   NotFoundException,
+  ConflictException,
 } from '@nestjs/common';
 import { randomUUID, createHash } from 'crypto';
 import * as bcrypt from 'bcrypt';
@@ -45,10 +46,14 @@ export class AuthService {
 
   async register(dto: RegisterDto): Promise<{ message: string }> {
     const existing = await this.usersService.findByEmail(dto.email);
-    if (existing) throw new ForbiddenException('Email already in use');
+    if (existing) {
+      throw new ConflictException('An account with this email already exists');
+    }
 
     const existingUsername = await this.usersService.findByUsername(dto.username);
-    if (existingUsername) throw new ForbiddenException('Username already taken');
+    if (existingUsername) {
+      throw new ConflictException('This username is already taken');
+    }
 
     const emailVerificationToken = randomUUID();
     const user = await this.usersService.create({ ...dto, emailVerificationToken });
@@ -134,13 +139,15 @@ export class AuthService {
 
   async login(dto: LoginDto): Promise<{ user: User; access_token: string; refresh_token: string }> {
     const user = await this.usersService.findByEmail(dto.email);
-    if (!user) throw new UnauthorizedException('Invalid credentials');
+    if (!user) throw new UnauthorizedException('Incorrect email or password');
 
     const match = await bcrypt.compare(dto.password, user.password);
-    if (!match) throw new UnauthorizedException('Invalid credentials');
+    if (!match) throw new UnauthorizedException('Incorrect email or password');
 
     if (!user.isEmailVerified) {
-      throw new ForbiddenException('Please verify your email before logging in');
+      throw new ForbiddenException(
+        'Please verify your email before logging in. Check your inbox.',
+      );
     }
 
     return this.generateAndStoreTokens(user);
